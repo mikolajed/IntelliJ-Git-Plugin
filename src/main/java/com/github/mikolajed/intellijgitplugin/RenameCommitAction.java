@@ -77,4 +77,8 @@ public class RenameCommitAction extends DumbAwareAction {
             }
         }.queue();
     }
+
+    public void queueTask(Task.Backgroundable task) {
+        task.queue();
+    }
 }
