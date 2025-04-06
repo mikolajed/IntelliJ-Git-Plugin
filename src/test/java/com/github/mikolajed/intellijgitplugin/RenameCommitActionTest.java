@@ -149,4 +149,41 @@ class RenameCommitActionTest {
                     Messages.showErrorDialog("Failed to rename commit: Something went wrong", "Error"));
         }
     }
+
+    @Test
+    void actionPerformed_emptyMessage_loopsUntilValid() {
+        try (var mockedStatic = mockStatic(Messages.class)) {
+            when(gitManager.getRepositories()).thenReturn(List.of(repo));
+            GitLineHandler logHandler = mock(GitLineHandler.class);
+            GitCommandResult logResult = mock(GitCommandResult.class);
+            when(git.runCommand(any(GitLineHandler.class))).thenReturn(logResult).thenReturn(mock(GitCommandResult.class));
+            when(logResult.success()).thenReturn(true);
+            when(logResult.getOutputAsJoinedString()).thenReturn("Original\nMessage");
+            when(Messages.showMultilineInputDialog(eq(project), anyString(), eq("Rename Commit"), anyString(), any(), any()))
+                    .thenReturn("") // First: empty
+                    .thenReturn(" ") // Second: whitespace
+                    .thenReturn("New\nMessage"); // Third: valid
+
+            RenameCommitAction spyAction = spy(action);
+            ArgumentCaptor<Task.Backgroundable> taskCaptor = ArgumentCaptor.forClass(Task.Backgroundable.class);
+            doNothing().when(spyAction).queueTask(any());
+
+            spyAction.actionPerformed(event);
+
+            mockedStatic.verify(() ->
+                    Messages.showWarningDialog("Commit message cannot be empty.", "Invalid Input"), times(2));
+            verify(spyAction).queueTask(taskCaptor.capture());
+            Task.Backgroundable task = taskCaptor.getValue();
+
+            GitCommandResult amendResult = mock(GitCommandResult.class);
+            when(git.runCommand(any(GitLineHandler.class))).thenReturn(amendResult);
+            when(amendResult.success()).thenReturn(true);
+
+            task.run(mock(ProgressIndicator.class));
+            task.onSuccess();
+
+            mockedStatic.verify(() ->
+                    Messages.showInfoMessage("<b>Commit message updated to:</b>\nNew\nMessage", "Success"));
+        }
+    }
 }
