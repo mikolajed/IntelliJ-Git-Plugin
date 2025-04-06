@@ -1,24 +1,16 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.mikolajed.intellijgitplugin</id>
     <name>IntelliJGitPlugin</name>
     <vendor>mikolajed</vendor>
-
     <depends>com.intellij.modules.platform</depends>
-
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.mikolajed.intellijgitplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.mikolajed.intellijgitplugin.startup.MyProjectActivity" />
-    </extensions>
+    <depends>Git4Idea</depends>
+    <idea-version since-build="243" until-build="253.*"/>
 
     <actions>
-        <action id="com.github.mikolajed.intellijgitplugin.HelloWorldAction"
-                class="com.github.mikolajed.intellijgitplugin.HelloWorldAction"
-                text="Say Hello World"
-                description="Displays a Hello World message">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        <action id="com.github.mikolajed.intellijgitplugin.RenameCommitAction"
+                class="com.github.mikolajed.intellijgitplugin.RenameCommitAction" text="Rename Current Commit"
+                description="Renames the most recent Git commit">
+            <add-to-group group-id="Git.MainMenu" anchor="first"/>
         </action>
     </actions>
 </idea-plugin>
