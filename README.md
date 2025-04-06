@@ -4,48 +4,73 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Adjust the [pluginGroup](./gradle.properties) and [pluginName](./gradle.properties), as well as the [id](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Adjust the plugin description in `README` (see [Tips][docs:plugin-description])
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the `MARKETPLACE_ID` in the above README badges. You can obtain it once the plugin is published to JetBrains Marketplace.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+A simple IntelliJ plugin to rename the most recent Git commit with a multi-line input dialog.
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Rename your latest Git commit directly from IntelliJ IDEA. Features a multi-line input dialog and validation to prevent empty commit messages—prompting again if you try to sneak one through. Built for developers who want a quick, reliable way to tweak commit messages without leaving the IDE.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
-
-To keep everything working, do not remove `<!-- ... -->` sections. 
+This section is extracted by Gradle into `plugin.xml` during the build process. Do not remove `<!-- ... -->` sections.
 <!-- Plugin description end -->
+
+## Features
+- Rename the most recent Git commit via `git commit --amend`.
+- Multi-line commit message support.
+- Prevents empty messages with a warning and re-prompt.
+- Skips amend if the new message matches the current one.
+- Error handling for failed amend attempts.
 
 ## Installation
 
-- Using the IDE built-in plugin system:
-  
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "IntelliJ-Git-Plugin"</kbd> >
-  <kbd>Install</kbd>
-  
-- Using JetBrains Marketplace:
+- **Using the IDE Built-in Plugin System**:
+- **Manually**: download the [latest release](https://github.com/mikolajed/IntelliJ-Git-Plugin/releases/latest) and install using <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+- **Git**: clone the repo and follow developer guide for instruction to build and run.
 
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
+## Developer Guide
+1. **Clone the Repo**:
+   ```bash
+   git clone https://github.com/mikolajed/IntelliJ-Git-Plugin.git
+   cd IntelliJ-Git-Plugin
+   ```
 
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+2. **Open in IntelliJ IDEA:**  
+- Tested on IntelliJ IDEA 2024.3.5 (Ultimate Edition).
+- <kbd>File > Open</kbd> > Select the cloned folder.
 
-- Manually:
+3. **Configure Project Structure:**
+- <kbd>File > Project Structure</kbd>
+- Under SDKs, click <kbd>+</kbd> > <kbd>IntelliJ Platform Plugin SDK</kbd> > Choose your IDEA install dir.
+- Add git4idea to the classpath:  
+- Select the SDK > <kbd>Classpath</kbd> tab > <kbd>+</kbd> > Navigate to <IDEA_DIR>/plugins/git4idea/lib/git4idea.jar > <kbd>OK</kbd>.
+- Apply and close.
 
-  Download the [latest release](https://github.com/mikolajed/IntelliJ-Git-Plugin/releases/latest) and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+  | New project                                | Add Git4Idea Classpath                      |
+  |--------------------------------------------|-------------------------------------------|
+  | ![Configure Project Structure](./img/sdk.png) | ![Git4Idea Classpath](./img/git4idea.png) |
 
 
----
-Plugin based on the [IntelliJ Platform Plugin Template][template].
+4. **Gradle Sync:**  
+- <kbd>File > Sync Project with Gradle Files</kbd> or click the Gradle elephant icon.
+- Wait for dependencies (JUnit 5, Mockito) to resolve.
 
-[template]: https://github.com/JetBrains/intellij-platform-plugin-template
-[docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
+5. **Run the Plugin:**
+- In IDEA: <kbd>Run > Run 'Plugin'</kbd> (or use the green play button).
+- Or via Gradle:  
+```bash
+./gradlew runIde
+```
+
+6. **Test It:**
+In the sandbox IDEA instance:  
+   - <kbd>File > New > Project</kbd> > Create a simple project.
+
+     | Plugin location                           | Rename current commiit                 |
+     |--------------------------------------------|-------------------------------------------|
+     | ![Click on git menu](./img/gitmenu.png) | ![Rename current commit](./img/newmsg.png) |
+
+- Init Git: git init, add a file, and commit (git commit -m "Initial commit").
+- Main toolbar > <kbd>Git</kbd> > <kbd>Rename Current Commit</kbd> > Change the message.
+
+7. **Build for Distribution:**
+```bash
+./gradlew buildPlugin
+```
