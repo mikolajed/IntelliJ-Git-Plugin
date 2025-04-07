@@ -4,12 +4,8 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 
-A simple IntelliJ plugin to rename the most recent Git commit with a multi-line input dialog.
-
 <!-- Plugin description -->
-Rename your latest Git commit directly from IntelliJ IDEA. Features a multi-line input dialog and validation to prevent empty commit messages—prompting again if you try to sneak one through. Built for developers who want a quick, reliable way to tweak commit messages without leaving the IDE.
-
-This section is extracted by Gradle into `plugin.xml` during the build process. Do not remove `<!-- ... -->` sections.
+Rename your latest Git commit directly from IntelliJ IDEA. Features a multi-line input dialog and validation to prevent empty commit messages.
 <!-- Plugin description end -->
 
 ## Features
@@ -20,10 +16,8 @@ This section is extracted by Gradle into `plugin.xml` during the build process. 
 - Error handling for failed amend attempts.
 
 ## Installation
-
-- **Using the IDE Built-in Plugin System**:
 - **Manually**: download the [latest release](https://github.com/mikolajed/IntelliJ-Git-Plugin/releases/latest) and install using <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
-- **Git**: clone the repo and follow developer guide for instruction to build and run.
+- **Git**: follow developer guide below.
 
 ## Developer Guide
 1. **Clone the Repo**:
@@ -34,17 +28,17 @@ This section is extracted by Gradle into `plugin.xml` during the build process. 
 
 2. **Open in IntelliJ IDEA:**  
 - Tested on IntelliJ IDEA 2024.3.5 (Ultimate Edition).
-- <kbd>File > Open</kbd> > Select the cloned folder.
+- Navigate to <kbd>File > Open</kbd> and select the cloned folder.
 
 3. **Configure Project Structure:**
-- <kbd>File > Project Structure</kbd>
-- Under SDKs, click <kbd>+</kbd> > <kbd>IntelliJ Platform Plugin SDK</kbd> > Choose your IDEA install dir.
-- Add git4idea to the classpath:  
+- Navigate to <kbd>File > Project Structure</kbd>
+- Under SDKs, click <kbd>+</kbd> > <kbd>IntelliJ Platform Plugin SDK</kbd> and choose your IDEA install dir.
+- Add `git4idea` to the classpath it might be at a different location.
 - Select the SDK > <kbd>Classpath</kbd> tab > <kbd>+</kbd> > Navigate to <IDEA_DIR>/plugins/git4idea/lib/git4idea.jar > <kbd>OK</kbd>.
 - Apply and close.
 
-  | New project                                | Add Git4Idea Classpath                      |
-  |--------------------------------------------|-------------------------------------------|
+  | New project SDK                               | Add Git4Idea to the classpath             |
+  |-----------------------------------------------|-------------------------------------------|
   | ![Configure Project Structure](./img/sdk.png) | ![Git4Idea Classpath](./img/git4idea.png) |
 
 
@@ -53,7 +47,7 @@ This section is extracted by Gradle into `plugin.xml` during the build process. 
 - Wait for dependencies (JUnit 5, Mockito) to resolve.
 
 5. **Run the Plugin:**
-- In IDEA: <kbd>Run > Run 'Plugin'</kbd> (or use the green play button).
+- In IDEA: <kbd>Run > Run 'Plugin'</kbd>.
 - Or via Gradle:  
 ```bash
 ./gradlew runIde
@@ -61,16 +55,17 @@ This section is extracted by Gradle into `plugin.xml` during the build process. 
 
 6. **Test It:**
 In the sandbox IDEA instance:  
-   - <kbd>File > New > Project</kbd> > Create a simple project.
+- Create a simple project.
 
-     | Plugin location                           | Rename current commiit                 |
-     |--------------------------------------------|-------------------------------------------|
-     | ![Click on git menu](./img/gitmenu.png) | ![Rename current commit](./img/newmsg.png) |
+  | Plugin location                           | Rename current commiit                 |
+  |--------------------------------------------|-------------------------------------------|
+  | ![Click on git menu](./img/gitmenu.png) | ![Rename current commit](./img/newmsg.png) |
 
-- Init Git: git init, add a file, and commit (git commit -m "Initial commit").
-- Main toolbar > <kbd>Git</kbd> > <kbd>Rename Current Commit</kbd> > Change the message.
+- Init Git: `git init`, add files, and create a commit (`git commit -m "Initial commit"`).
+- Navigate to main toolbar > <kbd>Git</kbd> > <kbd>Rename Current Commit</kbd> and change commit message when prompted.
 
 7. **Build for Distribution:**
+In case you make any changes w.r.t. current release version, you can build the plugin with:
 ```bash
 ./gradlew buildPlugin
 ```
