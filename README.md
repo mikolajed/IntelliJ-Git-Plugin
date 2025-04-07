@@ -57,7 +57,7 @@ Rename your latest Git commit directly from IntelliJ IDEA. Features a multi-line
 In the sandbox IDEA instance:  
 - Create a simple project.
 
-  | Plugin location                           | Rename current commiit                 |
+  | Plugin location                           | Rename current commii                     |
   |--------------------------------------------|-------------------------------------------|
   | ![Click on git menu](./img/gitmenu.png) | ![Rename current commit](./img/newmsg.png) |
 
