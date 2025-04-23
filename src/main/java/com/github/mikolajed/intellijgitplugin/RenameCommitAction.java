@@ -37,48 +37,59 @@ public class RenameCommitAction extends DumbAwareAction {
         GitRepositoryManager gitManager = GitRepositoryManager.getInstance(project);
         if (gitManager.getRepositories().isEmpty()) return;
 
-        GitLineHandler logHandler = new GitLineHandler(project, gitManager.getRepositories().get(0).getRoot(), GitCommand.LOG);
-        logHandler.addParameters("-1", "--pretty=%B");
-        GitCommandResult logResult = Git.getInstance().runCommand(logHandler);
-        String currentMessage = logResult.success() ? logResult.getOutputAsJoinedString().trim() : "";
-
-        String newMessage = null;
-        while (newMessage == null || newMessage.trim().isEmpty()) {
-            newMessage = Messages.showMultilineInputDialog(project,
-                    "Enter new commit message (use Enter for multiple lines):",
-                    "Rename Commit",
-                    newMessage == null ? currentMessage : newMessage,
-                    Messages.getQuestionIcon(),
-                    null);
-            if (newMessage == null) return; // User canceled
-            if (newMessage.trim().isEmpty()) {
-                Messages.showWarningDialog("Commit message cannot be empty.", "Invalid Input");
-            }
-        }
-
-        if (newMessage.trim().equals(currentMessage.trim())) {
-            Messages.showInfoMessage("New message is the same as the current one—no changes made.", "No Update");
-            return;
-        }
-
-        final String finalNewMessage = newMessage; // Capture for inner class
-        queueTask(new Task.Backgroundable(project, "Renaming Commit", true) {
-            GitCommandResult result;
+        queueTask(new Task.Backgroundable(project, "Fetching last commit message", false) {
+            GitCommandResult logResult;
+            String currentMessage;
 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                GitLineHandler handler = new GitLineHandler(project, gitManager.getRepositories().get(0).getRoot(), GitCommand.COMMIT);
-                handler.addParameters("--amend", "-m", finalNewMessage); // Use captured variable
-                result = Git.getInstance().runCommand(handler);
+                GitLineHandler logHandler = new GitLineHandler(project, gitManager.getRepositories().get(0).getRoot(), GitCommand.LOG);
+                logHandler.addParameters("-1", "--pretty=%B");
+                logResult = Git.getInstance().runCommand(logHandler);
+                currentMessage = logResult.success() ? logResult.getOutputAsJoinedString().trim() : "";
             }
 
             @Override
             public void onSuccess() {
-                if (result != null && result.success()) {
-                    Messages.showInfoMessage("<b>Commit message updated to:</b>\n" + finalNewMessage, "Success");
-                } else {
-                    Messages.showErrorDialog("Failed to rename commit: " + (result != null ? result.getErrorOutputAsJoinedString() : "Unknown error"), "Error");
+                String newMessage = null;
+                while (newMessage == null || newMessage.trim().isEmpty()) {
+                    newMessage = Messages.showMultilineInputDialog(project,
+                            "Enter new commit message (use Enter for multiple lines):",
+                            "Rename Commit",
+                            newMessage == null ? currentMessage : newMessage,
+                            Messages.getQuestionIcon(),
+                            null);
+                    if (newMessage == null) return; // User canceled
+                    if (newMessage.trim().isEmpty()) {
+                        Messages.showWarningDialog("Commit message cannot be empty.", "Invalid Input");
+                    }
                 }
+
+                if (newMessage.trim().equals(currentMessage.trim())) {
+                    Messages.showInfoMessage("New message is the same as the current one—no changes made.", "No Update");
+                    return;
+                }
+
+                final String finalNewMessage = newMessage;
+                queueTask(new Task.Backgroundable(project, "Renaming commit", true) {
+                    GitCommandResult result;
+
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        GitLineHandler handler = new GitLineHandler(project, gitManager.getRepositories().get(0).getRoot(), GitCommand.COMMIT);
+                        handler.addParameters("--amend", "-m", finalNewMessage);
+                        result = Git.getInstance().runCommand(handler);
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        if (result != null && result.success()) {
+                            Messages.showInfoMessage("<b>Commit message updated to:</b>\n" + finalNewMessage, "Success");
+                        } else {
+                            Messages.showErrorDialog("Failed to rename commit: " + (result != null ? result.getErrorOutputAsJoinedString() : "Unknown error"), "Error");
+                        }
+                    }
+                });
             }
         });
     }
